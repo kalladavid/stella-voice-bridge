@@ -1,14 +1,6 @@
-# node
 node_modules/
 build/
-
-# python
 __pycache__/
 *.pyc
 .env
-
-# docker
 *.log
-
-# OS
-.DS_Store

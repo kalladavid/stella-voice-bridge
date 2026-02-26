@@ -4,6 +4,9 @@ function App() {
   const [recording, setRecording] = useState(false);
   const [translatedText, setTranslatedText] = useState("");
 
+  let mediaRecorder;
+  let audioChunks = [];
+
   const startRecording = async () => {
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -11,12 +14,11 @@ function App() {
         return;
       }
 
-      setRecording(true);
-
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder = new MediaRecorder(stream);
 
-      let audioChunks = [];
+      setRecording(true);
+      audioChunks = [];
 
       mediaRecorder.start();
 
@@ -29,13 +31,10 @@ function App() {
         const formData = new FormData();
         formData.append("file", audioBlob, "voice.wav");
 
-        const response = await fetch(
-          "http://YOUR_EC2_PUBLIC_IP:8000/translate-voice/",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
+        const response = await fetch("/api/translate-voice/", {
+          method: "POST",
+          body: formData,
+        });
 
         const data = await response.json();
         setTranslatedText(data.translated_text);
@@ -53,17 +52,45 @@ function App() {
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
+    <div style={{ textAlign: "center", marginTop: "60px" }}>
       <h1>🎙️ STELLA Voice Bridge</h1>
 
       {!recording ? (
-        <button onClick={startRecording}>Start Speaking</button>
+        <button
+          onClick={startRecording}
+          style={{
+            padding: "12px 24px",
+            fontSize: "18px",
+            backgroundColor: "#4CAF50",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          Start Speaking
+        </button>
       ) : (
-        <button onClick={() => window.stopRecording()}>Stop</button>
+        <button
+          onClick={() => window.stopRecording()}
+          style={{
+            padding: "12px 24px",
+            fontSize: "18px",
+            backgroundColor: "#f44336",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          Stop
+        </button>
       )}
 
-      <h2>Translated Text:</h2>
-      <p>{translatedText}</p>
+      <h2 style={{ marginTop: "40px" }}>Translated Text:</h2>
+      <p style={{ fontSize: "20px", fontWeight: "bold" }}>
+        {translatedText}
+      </p>
     </div>
   );
 }

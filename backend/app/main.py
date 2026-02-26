@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File
 import whisper
 from googletrans import Translator
@@ -5,7 +6,13 @@ from gtts import gTTS
 import os
 
 app = FastAPI(title="STELLA Voice Bridge")
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 model = whisper.load_model("base")
 translator = Translator()
 
